@@ -345,9 +345,19 @@ fn selection(app: &mut PhotocraftApp) -> Value {
 
 fn buckets(app: &mut PhotocraftApp) -> Value {
     let document = inspect(app).unwrap_or_default();
+    let app = &*app;
+    // Each layer's picture as the Layers panel draws it, framed as its Thumbnail Contents says.
+    let contents = crate::panels::layers_panel_ui::thumbnail_contents(app);
+    let thumbs = app.session.active().map(|st| crate::panels::layers_tree::PhotoThumbs::new(app, &st.doc));
     let out: Vec<Value> = layers_of(&document)
         .into_iter()
-        .map(|(layer, parent, depth)| {
+        .enumerate()
+        .map(|(index, (layer, parent, depth))| {
+            let thumbnail = thumbs
+                .as_ref()
+                .filter(|_| index < THUMBNAIL_LAYERS)
+                .zip(layer["id"].as_u64())
+                .and_then(|(thumbs, id)| layer_thumbnail(thumbs, id, contents));
             json!({
                 "id": bucket_id(layer),
                 "name": layer["name"],
@@ -357,11 +367,35 @@ fn buckets(app: &mut PhotocraftApp) -> Value {
                     "layerId": layer["id"], "layerKind": layer["kind"], "opacity": layer["opacity"], "fill": layer["fill"], "blend": layer["blend"],
                     "selected": layer["selected"], "clipped": layer["clipped"], "hasMask": layer["hasMask"], "bounds": layer["bounds"],
                     "parent": parent.and_then(Value::as_u64).map(|id| format!("layer:{id}")), "depth": depth,
+                    "thumbnail": thumbnail,
                 },
             })
         })
         .collect();
     json!({ "kinds": ["layer"], "count": out.len(), "buckets": out })
+}
+
+/// How many layers get a picture in Studio's layer list; past that the list stays light.
+const THUMBNAIL_LAYERS: usize = 200;
+
+/// A layer's picture as the Layers panel draws it, as a small PNG data URL for Studio's layer list
+/// (a 16-point cell at twice the pixels); none for a layer the panel draws no picture for (a
+/// group, an adjustment, text).
+fn layer_thumbnail(
+    thumbs: &crate::panels::layers_tree::PhotoThumbs<'_>,
+    id: u64,
+    contents: craft::layers::ui::thumbs::ThumbContents,
+) -> Option<String> {
+    use craft::layers::ui::thumbs::LayerThumb;
+    use craft::ui::primitives::{ThumbRender, ThumbRequest, ThumbSource};
+    let key = LayerThumb::pixels(photocraft_doc::LayerId(id), contents);
+    let ThumbRender::Ready(image) = thumbs.render(&key, &ThumbRequest::for_cell(16.0, 2.0)) else { return None };
+    let [width, height] = image.size;
+    let pixels: Vec<u8> = image.pixels.iter().flat_map(|c| c.to_srgba_unmultiplied()).collect();
+    let png = photocraft_codecs::Image::from_u8(width as u32, height as u32, photocraft_codecs::ChannelLayout::Rgba, pixels)
+        .and_then(|image| photocraft_codecs::encode(&image, photocraft_codecs::Format::Png, &Default::default()))
+        .ok()?;
+    Some(format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(png)))
 }
 
 /// Why `run-command` does not run command `id` with `params`; `None` when it may.
@@ -683,6 +717,11 @@ mod tests {
         let bucket = listed["buckets"].as_array().unwrap().iter().find(|b| b["id"] == format!("layer:{layer}")).unwrap().clone();
         assert_eq!((bucket["kind"].clone(), bucket["visible"].clone(), bucket["meta"]["depth"].clone()), (json!("layer"), json!(true), json!(1)));
         assert!(bucket["meta"]["parent"].as_str().is_some_and(|parent| parent.starts_with("layer:")));
+        // A pixel layer comes with its picture; the group around it, which the panel draws no
+        // picture for, without one.
+        assert!(bucket["meta"]["thumbnail"].as_str().is_some_and(|url| url.starts_with("data:image/png;base64,iVBOR")), "{bucket}");
+        let group = listed["buckets"].as_array().unwrap().iter().find(|b| bucket["meta"]["parent"] == b["id"]).unwrap();
+        assert_eq!(group["meta"]["thumbnail"], Value::Null);
     }
 
     #[test]
