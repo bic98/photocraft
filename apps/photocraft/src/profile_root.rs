@@ -99,10 +99,10 @@ fn forbidden_roots(platform: Platform, env: &impl Fn(&str) -> Option<OsString>, 
                 ["APPDATA", "LOCALAPPDATA"].into_iter().map(|key| required_base(env, key).map(|p| p.join("Photocraft"))).collect::<Result<Vec<_>, _>>()?;
             // The MSI's default per-user and per-machine folders (install-policy.wxi). A custom
             // install folder is not known here; the executable's own folder is fenced below.
-            roots.push(required_base(env, "LOCALAPPDATA")?.join("Programs").join("ArtCraft").join("PhotoCraft"));
+            roots.push(required_base(env, "LOCALAPPDATA")?.join("Programs").join("ArtCraft").join("PAULGA Photo"));
             for key in ["ProgramW6432", "ProgramFiles", "ProgramFiles(x86)"] {
                 if let Some(base) = env(key).filter(|v| !v.is_empty()) {
-                    roots.push(absolute(PathBuf::from(base), key)?.join("ArtCraft").join("PhotoCraft"));
+                    roots.push(absolute(PathBuf::from(base), key)?.join("ArtCraft").join("PAULGA Photo"));
                 }
             }
             roots
@@ -128,8 +128,8 @@ fn forbidden_roots(platform: Platform, env: &impl Fn(&str) -> Option<OsString>, 
                 library.join("Preferences/Photocraft"),
                 library.join("Preferences/ai.storyteller.photocraft.plist"),
                 library.join("Saved Application State/ai.storyteller.photocraft.savedState"),
-                home.join("Applications/PhotoCraft.app"),
-                PathBuf::from("/Applications/PhotoCraft.app"),
+                home.join("Applications/PAULGA Photo.app"),
+                PathBuf::from("/Applications/PAULGA Photo.app"),
             ]
         }
     };
@@ -214,7 +214,7 @@ fn validate_for(
     }
     let chosen = canonical_future(root)?;
     if is_portable_layout(root, platform) || is_portable_layout(&chosen, platform) {
-        return Err("the nightly root must not use a portable PhotoCraft installation or its PhotoCraftData settings folder".into());
+        return Err("the nightly root must not use a portable PAULGA Photo installation or its PhotoCraftData settings folder".into());
     }
     let exe = absolute(exe.ok_or("cannot establish the installation boundary")?.to_path_buf(), "the executable")?;
     let mut forbidden = forbidden_roots(platform, &env, &exe)?;
@@ -513,7 +513,7 @@ mod tests {
     #[test]
     fn mac_fences_only_app_library_subtrees_and_the_entire_bundle() {
         let mut fixture = Fixture::new();
-        fixture.exe = fixture.root.join("install/PhotoCraft Nightly.app/Contents/MacOS/PhotoCraft");
+        fixture.exe = fixture.root.join("install/PAULGA Photo Nightly.app/Contents/MacOS/PhotoCraft");
         std::fs::create_dir_all(fixture.exe.parent().unwrap()).unwrap();
         std::fs::write(&fixture.exe, b"fixture executable, never run").unwrap();
         let library = fixture.home().join("Library");
@@ -551,17 +551,17 @@ mod tests {
     fn windows_default_msi_install_folders_are_fenced() {
         let mut fixture = Fixture::new();
         let local = PathBuf::from(fixture.get("LOCALAPPDATA").unwrap());
-        let per_user = local.join("Programs").join("ArtCraft").join("PhotoCraft");
+        let per_user = local.join("Programs").join("ArtCraft").join("PAULGA Photo");
         assert!(fixture.check(Platform::Windows, &per_user.join("nightly")).unwrap_err().contains("overlap"));
         for key in ["ProgramW6432", "ProgramFiles", "ProgramFiles(x86)"] {
             let base = fixture.root.join(format!("machine {key}"));
             fixture.env.insert(key.into(), base.clone().into_os_string());
-            let machine = base.join("ArtCraft").join("PhotoCraft");
+            let machine = base.join("ArtCraft").join("PAULGA Photo");
             assert!(fixture.check(Platform::Windows, &machine.join("nightly")).unwrap_err().contains("overlap"));
             assert!(!machine.exists());
         }
         let sibling = local.join("Programs").join("ArtCraft").join("ArtCraftLauncher").join("nightly").join("photocraft");
-        assert!(fixture.check(Platform::Windows, &sibling).is_ok(), "the Launcher's own Programs sibling is not PhotoCraft's install");
+        assert!(fixture.check(Platform::Windows, &sibling).is_ok(), "the Launcher's own Programs sibling is not PAULGA Photo's install");
     }
 
     #[test]

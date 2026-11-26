@@ -81,7 +81,7 @@ fn footer_links() -> [StartLink; 3] {
     [
         StartLink::url(tl!("Website"), Some(IconId::new("link")), crate::links::APP_PAGE),
         // A speech bubble and a chain link, as the rail showed before the framework move (#15449).
-        StartLink::url(tl!("Discord"), Some(IconId::new("note")), crate::links::DISCORD),
+        StartLink::url(tl!("PAULGA Studio"), Some(IconId::new("note")), crate::links::DISCORD),
         StartLink::url(tl!("GitHub"), Some(IconId::new("link_layers")), crate::links::GITHUB),
     ]
 }

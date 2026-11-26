@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Build, sign and package PhotoCraft for Windows.
+  Build, sign and package PAULGA Photo for Windows.
 
 .DESCRIPTION
   Produces, in $env:DIST (default: dist/release):
@@ -61,7 +61,7 @@ if (-not $Nightly) {
   if (-not $env:PHOTOCRAFT_BUILD_DATE) { $env:PHOTOCRAFT_BUILD_DATE = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd') }
 }
 
-Write-Output "PhotoCraft $Version for Windows $Arch ($Target)"
+Write-Output "PAULGA Photo $Version for Windows $Arch ($Target)"
 
 if ($Nightly) {
   & (Join-Path $PSScriptRoot 'nightly.ps1') -Arch $Arch -Version $Version -Target $Target -TargetDir $TargetDir -Dist $Dist -SkipBuild:$SkipBuild -BuildOnly:$BuildOnly
@@ -98,7 +98,7 @@ foreach ($check in @(@('photocraft.exe', 2), @('photocraft-cli.exe', 3))) {
   if ($h.Subsystem -ne $check[1]) { throw "$($check[0]) has PE subsystem $($h.Subsystem), expected $($check[1])" }
   Write-Output "ok $($check[0]): $Arch, PE subsystem $($h.Subsystem)"
 }
-if ((Get-Item -LiteralPath (Join-Path $Bin 'photocraft.exe')).VersionInfo.ProductName -eq 'PhotoCraft Nightly') {
+if ((Get-Item -LiteralPath (Join-Path $Bin 'photocraft.exe')).VersionInfo.ProductName -eq 'PAULGA Photo Nightly') {
   throw 'a nightly executable cannot be packaged as stable'
 }
 $Stage = Join-Path $TargetDir "windows-package\$Arch"
@@ -124,7 +124,7 @@ if ($env:CRAFT_FONTS_DIR) {
 # ---- end font notices for the MSI --------------------------------------------------------------
 
 # ---- MSI ---------------------------------------------------------------------------------------
-# The setup wizard's art, drawn here from the app icon so the MSI shows PhotoCraft rather than
+# The setup wizard's art, drawn here from the app icon so the MSI shows PAULGA Photo rather than
 # WiX's stock bitmaps: a 493x58 banner across the top of the inner pages (the page title is drawn
 # over its left side, so that stays white) and a 493x312 backdrop for the Welcome and Finish pages
 # (their text sits on the right; the left 164 px are ours). Both must be 24-bit BMPs.
@@ -200,7 +200,7 @@ if ($env:CRAFT_FONTS_DIR) {
   }
 }
 # portable.txt beside photocraft.exe switches on portable mode: settings, presets and recovery
-# files go to PhotoCraftData\ next to the exe instead of %APPDATA% (#228; see app_dirs.rs).
+# files go to PAULGA PhotoData\ next to the exe instead of %APPDATA% (#228; see app_dirs.rs).
 Copy-Item (Join-Path $PSScriptRoot 'portable.txt') $Portable
 $Zip = Join-Path $Dist "photocraft-$Version-windows-$Arch-portable.zip"
 Remove-Item -Force $Zip -ErrorAction SilentlyContinue
@@ -220,7 +220,7 @@ Remove-Item -Recurse -Force $Check -ErrorAction SilentlyContinue
 # ---- debug symbols -----------------------------------------------------------------------------
 # The linker writes a PDB beside each exe, and the exe names it without a path (photocraft.pdb,
 # photocraft_cli.pdb). They ship as a separate, optional download so profilers (Windows Performance
-# Analyzer, Superluminal, Visual Studio) show PhotoCraft's function names for the released
+# Analyzer, Superluminal, Visual Studio) show PAULGA Photo's function names for the released
 # binaries (#688). Signing doesn't change the PDB signature an exe records, so they match the
 # signed exes; a rebuild of the same commit writes a PDB that doesn't.
 $Symbols = Join-Path $TargetDir "windows-package\photocraft-$Version-windows-$Arch-symbols"

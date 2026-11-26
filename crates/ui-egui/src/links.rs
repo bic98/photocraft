@@ -1,17 +1,17 @@
-//! Community and project links: the Help menu, the About dialog, the start screen and the title
-//! bar all open these. URLs follow the crafting-app pattern (`getartcraft.com/apps/<app>`,
-//! `github.com/storytold/<app>`).
+//! PAULGA and project links: the Help menu, the About dialog, the start screen and the title
+//! bar all open these. The constant and command names are upstream's; the links are PAULGA's,
+//! except `ARTCRAFT_WEBSITE`, which credits the original project.
 
 use serde_json::{Value, json};
 
 use crate::PhotocraftApp;
 
-pub const DISCORD: &str = "https://discord.gg/artcraft";
-pub const ARTCRAFT_WEBSITE: &str = "https://getartcraft.com";
-pub const APP_PAGE: &str = "https://getartcraft.com/apps/photocraft";
-pub const TUTORIALS: &str = "https://getartcraft.com/tutorials";
-pub const GITHUB: &str = "https://github.com/storytold/photocraft";
-pub const ISSUES: &str = "https://github.com/storytold/photocraft/issues";
+pub const DISCORD: &str = "https://studio.paulga.com";
+pub const ARTCRAFT_WEBSITE: &str = "https://github.com/storytold/photocraft";
+pub const APP_PAGE: &str = "https://paulga.com";
+pub const TUTORIALS: &str = "https://studio.paulga.com";
+pub const GITHUB: &str = "https://github.com/bic98/photocraft";
+pub const ISSUES: &str = "https://studio.paulga.com";
 
 /// Help-menu link commands: (id, url). Labels live in `menus::UI_COMMANDS`.
 pub const COMMANDS: &[(&str, &str)] =

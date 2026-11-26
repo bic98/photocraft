@@ -1,7 +1,7 @@
 {
   "id": "photocraft",
-  "name": "PhotoCraft",
-  "upgradeCode": "D9660F32-2D0A-4ABE-B73D-17BE25F1542C",
+  "name": "PAULGA Photo",
+  "upgradeCode": "599CB8DD-F892-4171-9EDC-B1A3D63863FD",
   "sources": [
     "photocraft.wxs"
   ],
@@ -154,7 +154,7 @@
       "-1",
       "Software\\Classes\\Applications\\photocraft.exe",
       "FriendlyAppName",
-      "PhotoCraft"
+      "PAULGA Photo"
     ],
     [
       "-1",
@@ -296,7 +296,7 @@
     ],
     [
       "-1",
-      "Software\\PhotoCraft",
+      "Software\\PAULGA Photo",
       "InstallDir",
       "[INSTALLFOLDER]"
     ]

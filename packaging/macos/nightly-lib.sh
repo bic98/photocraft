@@ -3,7 +3,7 @@
 # Stable packaging (package.sh, verify.sh) does not source this file. The text checks take tool output
 # as arguments, so packaging/macos/nightly_sign_tests.py runs them without macOS.
 
-MAC_NIGHTLY_APP='PhotoCraft Nightly.app'
+MAC_NIGHTLY_APP='PAULGA Photo Nightly.app'
 MAC_NIGHTLY_ID='ai.storyteller.photocraft.nightly'
 # The release environment's names, as stable release.yml passes them (packaging/macos/import-cert.sh).
 MAC_NIGHTLY_SECRETS=(APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD KEYCHAIN_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID)

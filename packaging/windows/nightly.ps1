@@ -45,7 +45,7 @@ function Get-NightlySourceState([string] $RepositoryRoot) {
 }
 
 function Assert-NightlyFlavor([string] $ProductName, [string] $VersionOutput, [string] $ExpectedVersion) {
-  if ($ProductName -ne 'PhotoCraft Nightly' -or $VersionOutput -cne "PhotoCraft $ExpectedVersion (nightly-v1)") {
+  if ($ProductName -ne 'PAULGA Photo Nightly' -or $VersionOutput -cne "PAULGA Photo $ExpectedVersion (nightly-v1)") {
     throw 'the executable is not the compiled nightly-v1 flavor'
   }
 }
@@ -105,7 +105,7 @@ $VersionInfo = (Get-Item -LiteralPath $Exe).VersionInfo
 $ProductName = $VersionInfo.ProductName
 if ($VersionInfo.ProductVersion -cne $Version) { throw 'nightly PE ProductVersion differs from the feed identity' }
 # Check the embedded build flavor before invoking even the side-effect-free version query.
-if ($ProductName -ne 'PhotoCraft Nightly') { throw 'nightly executable is missing the embedded build flavor' }
+if ($ProductName -ne 'PAULGA Photo Nightly') { throw 'nightly executable is missing the embedded build flavor' }
 $VersionOutput = (& $Exe --version | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) { throw 'nightly --version query failed' }
 Assert-NightlyFlavor $ProductName $VersionOutput $Version

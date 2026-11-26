@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # App-owned GUI-only Nightly for Apple silicon, compile step only (no signing material):
 #
-#   $DIST/photocraft-<version>-macos-aarch64-nightly.zip   PhotoCraft Nightly.app, unsigned
+#   $DIST/photocraft-<version>-macos-aarch64-nightly.zip   PAULGA Photo Nightly.app, unsigned
 #
 # Usage: packaging/macos/nightly.sh --arch aarch64
 #

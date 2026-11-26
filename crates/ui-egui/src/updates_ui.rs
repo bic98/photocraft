@@ -17,6 +17,12 @@ pub(crate) struct Runtime {
     outcome_announced: bool,
 }
 
+/// Whether this build checks for updates. Off: the only release feed the checker knows is the
+/// original project's (`craft::update::suite::PHOTOCRAFT`), and those releases are not this
+/// product's updates. Help ▸ Check for Updates says so instead of offering them.
+#[cfg(not(target_arch = "wasm32"))]
+const UPDATE_CHECK: bool = false;
+
 #[cfg(not(target_arch = "wasm32"))]
 fn stable_updater<T>(identity: crate::os_window::LaunchIdentity, make: impl FnOnce() -> T) -> Option<T> {
     crate::os_window::stable_services_for(identity).then(make)
@@ -26,9 +32,9 @@ impl Default for Runtime {
     fn default() -> Self {
         Self {
             #[cfg(not(target_arch = "wasm32"))]
-            updater: stable_updater(crate::os_window::identity(), || {
-                craft::update::updater::Updater::new(&crate::UPDATE_APP, photocraft_engine::build_info::VERSION)
-            }),
+            updater: UPDATE_CHECK
+                .then(|| stable_updater(crate::os_window::identity(), || craft::update::updater::Updater::new(&crate::UPDATE_APP, photocraft_engine::build_info::VERSION)))
+                .flatten(),
             #[cfg(not(target_arch = "wasm32"))]
             result_dialog: None,
             #[cfg(not(target_arch = "wasm32"))]
@@ -40,7 +46,11 @@ impl Default for Runtime {
 /// Help ▸ Check for Updates: starts a check whose outcome the result window shows.
 #[cfg(not(target_arch = "wasm32"))]
 pub(crate) fn check(app: &mut PhotocraftApp, _ctx: &egui::Context, _params: Value) -> Result<Value, String> {
-    let updater = app.updates_rt.updater.as_mut().ok_or("Nightly updates are managed by ArtCraft Launcher")?;
+    let updater = app.updates_rt.updater.as_mut().ok_or(if crate::os_window::stable_services_allowed() {
+        "PAULGA Photo does not check for updates: this build is not updated from the original project's releases"
+    } else {
+        "Nightly updates are managed by ArtCraft Launcher"
+    })?;
     updater.check_now();
     app.ui.updates_open = true;
     Ok(serde_json::json!({"status": "checking"}))
@@ -136,6 +146,18 @@ pub(crate) fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     }
 }
 
+/// Whether an update checker exists in this session, for `ui.inspect`.
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) fn enabled(app: &PhotocraftApp) -> bool {
+    app.updates_rt.updater.is_some()
+}
+
+/// The web build has no checker.
+#[cfg(target_arch = "wasm32")]
+pub(crate) fn enabled(_app: &PhotocraftApp) -> bool {
+    false
+}
+
 /// The updater's installation progress or error line, for `ui.inspect`.
 #[cfg(not(target_arch = "wasm32"))]
 pub(crate) fn status_message(app: &PhotocraftApp) -> Option<String> {
@@ -155,7 +177,7 @@ pub fn preview_release(app: &mut PhotocraftApp, version: &str, url: &str) {
     updater.offer(craft::update::Release {
         tag: format!("v{version}"),
         version: craft::update::parse_version(version),
-        name: format!("PhotoCraft {version}"),
+        name: format!("PAULGA Photo {version}"),
         html_url: url.into(),
         ..Default::default()
     });
@@ -196,6 +218,20 @@ mod tests {
         assert!(app.ui.updates_open);
         assert_ne!(*app.updates_rt.updater.as_ref().unwrap().status(), craft::update::updater::Status::Idle);
         assert!(checks.recv_timeout(Duration::from_secs(5)).is_ok(), "the manual check ran");
+    }
+
+    /// This build has no release feed of its own, so the command refuses instead of reporting a check.
+    #[test]
+    #[cfg(not(target_arch = "wasm32"))]
+    fn check_refuses_and_says_why_while_no_checker_is_built() {
+        let mut app = app();
+        assert!(app.updates_rt.updater.is_none(), "no checker reaches the original project's release feed");
+        let ctx = app.ctx().clone();
+        let refused = menus::invoke(&mut app, &ctx, "help.checkForUpdates", serde_json::json!({})).unwrap_err();
+        assert!(refused.contains("does not check for updates"), "{refused}");
+        assert!(!app.ui.updates_open);
+        tick(&mut app);
+        assert!(!app.ui.updates_open);
     }
 
     #[test]

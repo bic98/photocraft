@@ -62,7 +62,7 @@ IDENTITY="$(sed -n 's/^MACOS_SIGN_IDENTITY=//p' <<<"$imported")"
   || mac_nightly_die 'import-cert.sh did not import a signing identity'
 mac_nightly_identity_is_team "$(security find-identity -v -p codesigning "$KEYCHAIN" | grep -F " $IDENTITY " || true)" "$IDENTITY" "$APPLE_TEAM_ID" \
   || mac_nightly_die "the imported identity is not a Developer ID Application of team $APPLE_TEAM_ID"
-echo "==> PhotoCraft Nightly $VERSION for macOS (aarch64), identity: $IDENTITY"
+echo "==> PAULGA Photo Nightly $VERSION for macOS (aarch64), identity: $IDENTITY"
 
 # ---- the unsigned bundle ---------------------------------------------------------------------------
 mac_nightly_check_zip_entries "$INPUT"

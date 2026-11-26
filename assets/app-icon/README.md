@@ -1,34 +1,26 @@
-# PhotoCraft app icon
+# PAULGA Photo app icon
 
-A **nine-tailed kitsune with a brow diamond**: an engraving portrait, seated, looking back at the
-viewer, in the Crafting Apps' owl-template framing (full-bleed field, head and body filling the
-tile, tails running off the edges).
-
-## Palette
-
-Exactly three colours:
-
-| Colour | Hex | Used for |
-|---|---|---|
-| Ink | `#0b0b0c` | line work and contours |
-| Paper | `#efe9dc` | the figure |
-| PhotoCraft blue (app colour) | `#2f7bf5` | the full-bleed field |
+The **PAULGA mark**: the white "P" built from rounded bars on a black field
+(`paulga-logo.svg`, PAULGA's own work). The same mark is the app icon of the other PAULGA products.
 
 ## Geometry
 
-A 512-unit tile (`viewBox="0 0 512 512"`), rounded square with `rx=112`, no border. The macOS
-renders pad it onto Apple's 824/1024 icon grid; the Windows and Linux renders use the whole tile,
-as the other Crafting Apps do.
+The mark fills a 512-unit tile (`viewBox="0 0 512 512"`), a rounded square with `rx=112`, no
+border. The macOS renders pad the tile onto Apple's 824/1024 icon grid; the Windows and Linux
+renders use the whole tile. The file names keep `photocraft` and `ai.storyteller.photocraft`
+because the build scripts, packaging and the desktop entry refer to them.
 
-## Provenance
+## Provenance and licence
 
-The owner's original drawing, made in ArtCraft (2880 px, engraving style, keyed to the palette),
-vectorised. License: see `LICENSE.txt`.
+`paulga-logo.svg` is PAULGA's own work, supplied by the product's owner; every other file here is
+rendered from it. It is a PAULGA brand asset, not MIT OR Apache-2.0 material: see `LICENSE.txt`.
+The PhotoCraft icon these files replaced is in the repository history.
 
 ## Files
 
-- `photocraft.svg`: canonical master (traced at 2048 px).
-- `photocraft-small.svg`: lighter trace (traced at 1024 px); also the hicolor scalable icon.
+- `paulga-logo.svg`: the mark as supplied (160-unit square, no rounding).
+- `photocraft.svg`, `photocraft-small.svg`: the mark on the rounded 512-unit tile; the second is
+  also the hicolor scalable icon.
 - `photocraft-1024.png`: 1024 px render on the macOS grid.
 - `photocraft.icns`: macOS bundle icon (`CFBundleIconFile`).
 - `photocraft.ico`: Windows icon, 16–256 px, embedded in the `.exe` by `apps/photocraft/build.rs`.
@@ -40,19 +32,16 @@ The app also sets the window icon and Wayland app ID at runtime (`apps/photocraf
 exe, so the MSI's `<Icon Id>` keeps the `.exe` extension (ICE50); `app_icon.rs` documents the
 details and tests the `.ico` sizes and the WiX icon references.
 
-## Regenerate
+## How these files were made
 
-Replace `photocraft.svg` (and `photocraft-small.svg`), then run `packaging/icons.sh`. It needs
-`resvg`, plus `iconutil` on macOS; the `.ico` is packed by `cargo xtask ico`.
+The mark is rectangles and ellipses only, so the PNG, ICO and ICNS files were drawn from its
+shapes with Pillow 12.3 at 4096 px, clipped to the rounded tile and scaled down (Lanczos) to each
+size. `packaging/icons.sh` renders the same set from `photocraft.svg` with `resvg` (plus
+`iconutil` on macOS; the `.ico` is packed by `cargo xtask ico`); it has not been run on these files.
 
 ## Nightly channel
 
-The nightly derivatives keep the foreground artwork, alpha and Mac padding unchanged. Only the
-background contribution changes from the stable blue to the selected deep background. There is
-no letter badge or crescent; the app and Launcher also identify the channel in text.
-
-`photocraft-nightly.png` and its nine-frame ICO use the existing own256 master. The separate
-`photocraft-nightly-1024.png` and eleven-slot ICNS use the actual padded Mac1024 master, not an
-upscale. Input/output hashes, the palette-fit recipe and container sizes are recorded in
-[`nightly-provenance.json`](nightly-provenance.json). Stable source files are not recoloured.
-The old N-marked private Windows isolation package is separate and is not rebuilt for this art.
+The nightly files (`photocraft-nightly.png`, `photocraft-nightly-1024.png`, the ICO and the ICNS)
+are the same mark with the field changed from black to the deep blue the nightly channel already
+used (`#22395d`); the white shapes, the tile and the Mac padding are unchanged. There is no letter
+badge. Output hashes are in [`nightly-provenance.json`](nightly-provenance.json).

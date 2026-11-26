@@ -12,6 +12,10 @@ pub fn is_enabled(app: &PhotocraftApp, id: &str) -> bool {
     if crate::tool_shortcuts::tool(id).is_some() {
         return true;
     }
+    // The PAULGA Studio panel and its commands answer with or without a document.
+    if crate::studio::handles(id) {
+        return true;
+    }
     // Fit Artboard on Screen needs a board to fit (the bridged view command carries no engine rule).
     if id == "view.fitArtboardOnScreen" {
         return app.session.active().is_some_and(|d| d.doc.has_artboards());

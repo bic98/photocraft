@@ -59,6 +59,7 @@ pub mod proxy;
 pub mod render_path;
 pub(crate) mod scratch_reads;
 pub mod state;
+pub mod studio;
 pub mod texel_guard;
 pub mod theme;
 pub mod tone;
@@ -406,6 +407,12 @@ pub struct PhotocraftApp {
     /// screenshots, and the screenshot queue (`app/control.rs`).
     #[cfg(not(target_arch = "wasm32"))]
     control: Option<craft::automation::ControlChannel>,
+    /// The PAULGA Studio connection the host attached ([`studio`]); `None` where there is none.
+    pub studio: Option<std::sync::Arc<studio::Link>>,
+    /// The tools PAULGA Studio asks for, from the host's connection thread: a control channel of
+    /// their own, so a tool that starts a background job is answered when the job ends.
+    #[cfg(not(target_arch = "wasm32"))]
+    studio_control: Option<craft::automation::ControlChannel>,
     /// Live (uncommitted) adjustment edit shown on canvas while a slider is dragged.
     pub live_adjust: Option<(photocraft_doc::LayerId, Value)>,
     /// Frames rendered (for tests and the status bar).

@@ -18,7 +18,7 @@ use crate::PhotocraftApp;
 use crate::menus::items;
 
 /// The name the app menu, About, Hide and Quit show.
-pub const APP_NAME: &str = "PhotoCraft";
+pub const APP_NAME: &str = "PAULGA Photo";
 
 /// [`items::model`]'s menus laid out as a Mac menu bar, in the UI language.
 ///
@@ -67,7 +67,7 @@ pub fn sync(app: &mut PhotocraftApp, ctx: &egui::Context) {
     native.set_modal_rules(rules);
     let shown = (items::model(app, ctx).bar.revision(), app.framework.keymap_inputs());
     for c in native.sync_with(&shown, || laid_out(app, ctx)) {
-        log::info!("menu: {} is {} on macOS and {} in PhotoCraft; {}", c.shortcut.portable(), c.system, c.command.id, c.resolution);
+        log::info!("menu: {} is {} on macOS and {} in PAULGA Photo; {}", c.shortcut.portable(), c.system, c.command.id, c.resolution);
     }
     app.services.native_menu = Some(native);
 }

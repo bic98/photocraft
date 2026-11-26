@@ -46,7 +46,7 @@ esac
 export PHOTOCRAFT_MAINTAINER="${PHOTOCRAFT_MAINTAINER:-PhotoCraft maintainers <photocraft@storyteller.ai>}"
 BASENAME="photocraft-$VERSION-linux-$ARCH"
 
-echo "==> PhotoCraft $VERSION for Linux $ARCH ($FORMATS)"
+echo "==> PAULGA Photo $VERSION for Linux $ARCH ($FORMATS)"
 
 # The man-and-completions example writes photocraft-cli's man pages and shell completions below. It
 # is built in its own cargo run: built with the binaries, its dev-dependencies' features would be

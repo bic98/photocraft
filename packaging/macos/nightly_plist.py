@@ -33,8 +33,8 @@ def render(template: bytes, version: str, commit: str) -> bytes:
     for key in ASSOCIATIONS:
         data.pop(key, None)
     data.update(
-        CFBundleDisplayName="PhotoCraft Nightly",
-        CFBundleName="PhotoCraft Nightly",
+        CFBundleDisplayName="PAULGA Photo Nightly",
+        CFBundleName="PAULGA Photo Nightly",
         CFBundleIdentifier=IDENTIFIER,
         CFBundleExecutable="PhotoCraft",
         CFBundleIconFile="photocraft-nightly",

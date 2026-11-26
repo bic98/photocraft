@@ -91,6 +91,9 @@ impl PhotocraftApp {
             opacity_keys: craft::behavior::DigitKeys::default(),
             #[cfg(not(target_arch = "wasm32"))]
             control: None,
+            studio: None,
+            #[cfg(not(target_arch = "wasm32"))]
+            studio_control: None,
             live_adjust: None,
             frame: 0,
             notices_live: notices::Live::default(),

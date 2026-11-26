@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 use crate::EngineError;
 
 const COMMAND: &str = "file.scripts.imageProcessor";
-const NO_SOURCE: &str = "There were no source files that could be opened by PhotoCraft.";
+const NO_SOURCE: &str = "There were no source files that could be opened by PAULGA Photo.";
 
 fn settings(input: &Path, output: &Path, per_format: bool) -> Value {
     let mut params = json!({"input": input, "output": output});

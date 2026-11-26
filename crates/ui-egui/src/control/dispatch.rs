@@ -53,6 +53,9 @@ fn engine_methods(app: &mut PhotocraftApp, ctx: &egui::Context, req: &ControlReq
         // Background jobs (#210): running ones with progress, then the last few that ended.
         "jobs.list" => Reply::from_result(app.session.execute("jobs.list", json!({})).map_err(|e| e.to_string())),
         "jobs.cancel" => jobs_cancel(app, &req.params),
+        // A tool PAULGA Studio asked for, from the host's connection or any control client. A tool that starts a
+        // background job answers with that job's result.
+        "studio.tool" => run_waiting(app, true, |app| crate::studio::tools::call(app, &req.params)),
         "ui.menu.list" => {
             // Report the same enablement the native menu shows, so a listed item is invokable.
             let rows = crate::menus::model(app, ctx).rows().to_vec();

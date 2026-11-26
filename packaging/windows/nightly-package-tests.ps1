@@ -15,8 +15,8 @@ foreach ($bad in @('', '0.23.1', '../other', '0.23.1/elsewhere')) {
   try { Get-NightlyArchiveSpec $bad 'x64' | Out-Null } catch { $refused = $true }
   Assert $refused 'unsafe artifact version was accepted'
 }
-Assert-NightlyFlavor 'PhotoCraft Nightly' 'PhotoCraft 0.23.1-nightly.20261120.17.1.gabcdef012345 (nightly-v1)' '0.23.1-nightly.20261120.17.1.gabcdef012345'
-foreach ($pair in @(@('PhotoCraft', 'PhotoCraft 0.23.1 (nightly-v1)'), @('PhotoCraft Nightly', 'PhotoCraft 0.23.1'))) {
+Assert-NightlyFlavor 'PAULGA Photo Nightly' 'PAULGA Photo 0.23.1-nightly.20261120.17.1.gabcdef012345 (nightly-v1)' '0.23.1-nightly.20261120.17.1.gabcdef012345'
+foreach ($pair in @(@('PAULGA Photo', 'PAULGA Photo 0.23.1 (nightly-v1)'), @('PAULGA Photo Nightly', 'PAULGA Photo 0.23.1'))) {
   $refused = $false
   try { Assert-NightlyFlavor $pair[0] $pair[1] '0.23.1-nightly.20261120.17.1.gabcdef012345' } catch { $refused = $true }
   Assert $refused 'stable or mismatched build flavor was accepted'

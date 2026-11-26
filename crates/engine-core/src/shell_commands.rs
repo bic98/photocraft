@@ -76,18 +76,24 @@ pub const SHELL_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("window.toggle.dock", "Show/Hide Panels", &[], Some("Shift+Tab")),
     ("window.toggle.options", "Options", &["Window"], None),
     ("window.toggle.contextualTaskBar", "Contextual Task Bar", &["Window"], None),
+    // The PAULGA Studio connection: its panel, its switch and the tools Studio runs.
+    ("window.panel.studio", "PAULGA Studio", &["Window"], None),
+    ("studio.connect", "Connect to PAULGA Studio", &[], None),
+    ("studio.disconnect", "Disconnect from PAULGA Studio", &[], None),
+    ("studio.status", "PAULGA Studio Connection Status", &[], None),
+    ("studio.tool", "Run a PAULGA Studio Tool", &[], None),
     // Photoshop's Ctrl+Tab and Ctrl+Shift+Tab, on macOS too (⌘Tab belongs to the system, #2340).
     ("window.nextDocument", "Next Document", &[], Some("Ctrl+Tab")),
     ("window.previousDocument", "Previous Document", &[], Some("Ctrl+Shift+Tab")),
     ("edit.search", "Search…", &["Edit"], Some("Cmd+F")),
-    ("help.discord", "Join the ArtCraft Discord…", &["Help"], None),
-    ("help.website", "PhotoCraft Website", &["Help"], None),
-    ("help.artcraftWebsite", "ArtCraft Website", &["Help"], None),
-    ("help.github", "PhotoCraft on GitHub", &["Help"], None),
+    ("help.discord", "PAULGA Studio Website…", &["Help"], None),
+    ("help.website", "PAULGA Website", &["Help"], None),
+    ("help.artcraftWebsite", "PhotoCraft, the Original Project", &["Help"], None),
+    ("help.github", "PAULGA Photo on GitHub", &["Help"], None),
     ("help.reportIssue", "Report an Issue…", &["Help"], None),
     ("help.checkForUpdates", "Check for Updates…", &["Help"], None),
     ("help.systemInfo", "System Info…", &["Help"], None),
-    ("help.about", "About PhotoCraft", &["Help"], None),
+    ("help.about", "About PAULGA Photo", &["Help"], None),
 ];
 
 /// The tools, in toolbar order: shortcut id (`tools.select.<tool>`), Photoshop's name for it

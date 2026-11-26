@@ -99,6 +99,9 @@ impl PhotocraftApp {
             }
         }
         actions::suspended_guard(self, id)?;
+        if let Some(result) = crate::studio::command(self, id, &params) {
+            return result;
+        }
         if let Some(result) = panel_docking::command(self, id, &params) {
             return result;
         }
@@ -221,7 +224,7 @@ impl PhotocraftApp {
                 }
             }
             Err(e) => {
-                if id == "file.scripts.imageProcessor" && e == "There were no source files that could be opened by PhotoCraft." {
+                if id == "file.scripts.imageProcessor" && e == "There were no source files that could be opened by PAULGA Photo." {
                     crate::dialogs::alerts::alert(self, e.clone());
                 }
                 self.ui.status = e.clone();
@@ -456,7 +459,7 @@ mod image_processor_empty_source_tests {
         crate::dialogs::confirm(&mut app, &ctx, id).unwrap();
         assert!(app.framework.dialogs.get_dyn(id).is_none());
         assert_eq!(crate::dialogs::alerts::alerts(&app).len(), 1);
-        assert_eq!(app.ui.status, "There were no source files that could be opened by PhotoCraft.");
+        assert_eq!(app.ui.status, "There were no source files that could be opened by PAULGA Photo.");
         assert!(!output.exists());
     }
 }

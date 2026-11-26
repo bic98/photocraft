@@ -54,6 +54,9 @@ mod linux_libs;
 mod logging;
 mod monitor_profile;
 mod nightly_session;
+// The connection to PAULGA Studio, which writes its connection file only on Windows.
+#[cfg(windows)]
+mod paulga_studio;
 mod photoshop_settings;
 mod presentation;
 // The print portal needs the session bus (zbus, Linux only); its pure helpers are tested everywhere.
@@ -233,7 +236,7 @@ fn at_least_min_size(mut builder: egui::ViewportBuilder) -> egui::ViewportBuilde
 fn attach_log_file(logger: Option<&'static logging::AppLogger>) {
     if let (Some(logger), Some(dir)) = (logger, services::config_dir()) {
         match logger.attach_dir(&dir.join("logs")) {
-            Ok(path) => log::info!("PhotoCraft {}, log file {}", photocraft_engine::build_info::long_version(), path.display()),
+            Ok(path) => log::info!("PAULGA Photo {}, log file {}", photocraft_engine::build_info::long_version(), path.display()),
             // Standard error only by now (`attach_dir` gave up on the file); unlike `eprintln!`, never panics.
             Err(e) => log::warn!("no log file: {e}"),
         }
@@ -268,7 +271,7 @@ fn claim_single_instance(
     };
     match (single_instance::skip_reason(&context), services::config_dir()) {
         (Some(reason), _) => {
-            log::info!("running as a separate PhotoCraft: {reason}");
+            log::info!("running as a separate PAULGA Photo: {reason}");
             Continue(None)
         }
         (None, None) => Continue(None),
@@ -276,12 +279,12 @@ fn claim_single_instance(
             let paths: Vec<String> = files.iter().map(|f| single_instance::absolute(f)).collect();
             match single_instance::claim(&dir, &paths) {
                 single_instance::Launch::Forwarded => {
-                    log::info!("handed {} file(s) to the running PhotoCraft", paths.len());
+                    log::info!("handed {} file(s) to the running PAULGA Photo", paths.len());
                     Break(())
                 }
                 single_instance::Launch::Primary(primary) => Continue(Some(primary)),
                 single_instance::Launch::Standalone(reason) => {
-                    log::warn!("starting a separate PhotoCraft: {reason}");
+                    log::warn!("starting a separate PAULGA Photo: {reason}");
                     Continue(None)
                 }
             }
@@ -421,18 +424,18 @@ fn initialize_nightly_process_identity() -> Result<(), process_identity::Identit
 }
 
 fn report_launch_profile_error(error: &str) {
-    eprintln!("PhotoCraft launch profile: {error}");
+    eprintln!("PAULGA Photo launch profile: {error}");
     let desktop_session = cfg!(windows)
         || cfg!(target_os = "macos")
         || (cfg!(target_os = "linux") && ["DISPLAY", "WAYLAND_DISPLAY"].into_iter().any(|key| std::env::var_os(key).is_some_and(|v| !v.is_empty())));
     if build_flavor::needs_native_error(build_flavor::COMPILED, desktop_session) {
         if let Err(error) = initialize_nightly_process_identity() {
-            eprintln!("PhotoCraft launch profile: {error}");
+            eprintln!("PAULGA Photo launch profile: {error}");
             return;
         }
         #[cfg(any(windows, target_os = "linux", target_os = "macos"))]
         let _ = rfd::MessageDialog::new()
-            .set_title("PhotoCraft Nightly")
+            .set_title("PAULGA Photo Nightly")
             .set_description(error)
             .set_level(rfd::MessageLevel::Error)
             .set_buttons(rfd::MessageButtons::Ok)
@@ -448,7 +451,7 @@ fn prepare_launch() -> Option<Vec<std::ffi::OsString>> {
     // --version`: answered before root validation, process identity, IPC or any window.
     if build_flavor::COMPILED == build_flavor::BuildFlavor::NightlyV1 && (build_flavor::version_query(&argv) || launch_profile::version_query(&argv)) {
         use std::io::Write as _;
-        let _ = writeln!(std::io::stdout(), "PhotoCraft {}", build_flavor::version(build_flavor::COMPILED, env!("PHOTOCRAFT_BUILT_VERSION")));
+        let _ = writeln!(std::io::stdout(), "PAULGA Photo {}", build_flavor::version(build_flavor::COMPILED, env!("PHOTOCRAFT_BUILT_VERSION")));
         return None;
     }
     let early = launch_profile::parse_startup(argv, std::env::var_os("PHOTOCRAFT_GPU_STARTUP_FAILURE").is_some())
@@ -487,7 +490,7 @@ fn main() -> eframe::Result {
         && let Some(done) = craft_update::self_update::finish(&photocraft_ui_egui::UPDATE_APP, &std::env::args_os().skip(1).collect::<Vec<_>>())
     {
         if let Err(e) = done {
-            eprintln!("PhotoCraft update helper failed: {e}");
+            eprintln!("PAULGA Photo update helper failed: {e}");
             std::process::exit(1);
         }
         return Ok(());
@@ -521,6 +524,8 @@ fn main() -> eframe::Result {
     // the settings store (the app opens it later).
     let saved = services::saved_prefs();
     let prefs = &saved.prefs;
+    #[cfg(windows)]
+    let studio_wanted = photocraft_ui_egui::studio::wanted_in(prefs);
     // An adapter named in the environment is chosen at startup, which a forwarded launch never reaches.
     let rendering_mode = gpu_startup::rendering_prefs(&prefs.performance).1;
     if gpu_startup::adapter_override_is_process_specific(std::env::var("PHOTOCRAFT_GPU_ADAPTER").ok().as_deref(), rendering_mode, gpu_startup::ADAPTER_CHOICE) {
@@ -818,6 +823,12 @@ fn main() -> eframe::Result {
                     craft::automation::agents::AgentLink::new(services::config_dir(), photocraft_engine::build_info::long_version())
                 };
                 app.services.agent_link = Some(link);
+                // The PAULGA Studio connection: on unless the person switched it off in its panel.
+                #[cfg(windows)]
+                {
+                    let link = photocraft_ui_egui::studio::Link::new(studio_wanted);
+                    app = app.with_studio(link.clone(), paulga_studio::start(cc.egui_ctx.clone(), link));
+                }
             }
 
             #[cfg(target_os = "macos")]
@@ -880,16 +891,16 @@ fn main() -> eframe::Result {
                 use photocraft_ui_egui::i18n;
                 let message = if previous_nightly_unclean {
                     i18n::t(
-                        "The previous PhotoCraft Nightly session did not finish normally. You can report a problem from About. No diagnostics have been sent.",
+                        "The previous PAULGA Photo Nightly session did not finish normally. You can report a problem from About. No diagnostics have been sent.",
                     )
                 } else {
                     i18n::t(
-                        "PhotoCraft Nightly could not record session health in its private profile. You can still edit, but abnormal-exit detection is unavailable.",
+                        "PAULGA Photo Nightly could not record session health in its private profile. You can still edit, but abnormal-exit detection is unavailable.",
                     )
                 };
                 photocraft_ui_egui::notices::post(
                     &mut app,
-                    i18n::t("PhotoCraft Nightly"),
+                    i18n::t("PAULGA Photo Nightly"),
                     vec![message.to_owned()],
                     craft::theme::variant::Tone::Neutral,
                     None,
@@ -971,7 +982,7 @@ fn main() -> eframe::Result {
     // file to attach (#7643). A terminal or automation launch can read standard error or the
     // exit status instead, so it keeps the silent exit.
     if let Err(error) = &result {
-        log::error!("PhotoCraft could not start: {error}");
+        log::error!("PAULGA Photo could not start: {error}");
         if startup_report::needs_dialog(control_port.is_some()) {
             startup_report::show(&error.to_string(), &started_renderer, started_note.as_deref(), logger.and_then(logging::AppLogger::path).as_deref());
         }
@@ -1066,7 +1077,7 @@ mod tests {
             .with_fullscreen(true)
             .with_maximized(true);
         let opened = hook(saved);
-        assert_eq!(opened.fullscreen, Some(false), "Standard Screen Mode is where PhotoCraft starts");
+        assert_eq!(opened.fullscreen, Some(false), "Standard Screen Mode is where PAULGA Photo starts");
         assert_eq!(opened.maximized, Some(true), "the rest of the saved geometry is kept");
         assert_eq!(opened.inner_size, Some(egui::vec2(2560.0, 1392.0)));
     }

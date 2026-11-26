@@ -82,9 +82,9 @@ fn reset_appends_a_numbered_set_and_persists_it() {
     s.attach_preset_store(open(Box::new(store.clone())));
     s.actions_mut().list.new_set("Existing").unwrap();
     assert!(s.execute("actions.reset", json!({"confirm":true,"mode":"bad"})).is_err());
-    assert_eq!(s.execute("actions.reset", json!({"confirm":true,"mode":"append"})).unwrap()["set"], "PhotoCraft Basics");
-    assert_eq!(s.execute("actions.reset", json!({"confirm":true,"mode":"append"})).unwrap()["set"], "PhotoCraft Basics 2");
-    assert_eq!(s.actions().list.sets(), ["Existing", "PhotoCraft Basics", "PhotoCraft Basics 2"], "sets in the order they were made");
+    assert_eq!(s.execute("actions.reset", json!({"confirm":true,"mode":"append"})).unwrap()["set"], "PAULGA Photo Basics");
+    assert_eq!(s.execute("actions.reset", json!({"confirm":true,"mode":"append"})).unwrap()["set"], "PAULGA Photo Basics 2");
+    assert_eq!(s.actions().list.sets(), ["Existing", "PAULGA Photo Basics", "PAULGA Photo Basics 2"], "sets in the order they were made");
     assert_eq!(names(&s), ["Invert Colors", "Desaturate", "Invert Colors 2", "Desaturate 2"]);
     assert_eq!(s.actions().list.actions()[0].steps[0].command, "image.adjustments.invert");
     assert_eq!(s.actions().list.actions()[1].steps[0].command, "image.adjustments.desaturate");
@@ -94,7 +94,7 @@ fn reset_appends_a_numbered_set_and_persists_it() {
     assert_eq!(reopened.actions().list.actions(), s.actions().list.actions());
     assert_eq!(reopened.actions().list.sets(), s.actions().list.sets());
     s.execute("actions.reset", json!({"confirm":true,"mode":"replace"})).unwrap();
-    assert_eq!(s.actions().list.sets(), ["PhotoCraft Basics"]);
+    assert_eq!(s.actions().list.sets(), ["PAULGA Photo Basics"]);
     s.execute("actions.undoLibrary", json!({})).unwrap();
     assert_eq!(s.actions().list.sets(), reopened.actions().list.sets());
     assert!(s.execute("actions.undoLibrary", json!({})).is_err());
@@ -236,7 +236,7 @@ fn pre_attachment_replacement_persists_without_reloading_disk_and_keeps_undo() {
             continue;
         }
 
-        assert_eq!(s.actions().list.sets(), ["PhotoCraft Basics"]);
+        assert_eq!(s.actions().list.sets(), ["PAULGA Photo Basics"]);
         assert_eq!(names(&s), ["Invert Colors", "Desaturate"]);
         let mut reopened = crate::session();
         assert!(reopened.attach_preset_store(open(Box::new(store.clone()))).is_empty());

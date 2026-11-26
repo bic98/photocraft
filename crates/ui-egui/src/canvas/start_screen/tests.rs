@@ -29,15 +29,15 @@ fn rect(h: &H, label: &str) -> egui::Rect {
 fn home_and_the_links_sit_in_a_rail_left_of_the_content_at_desktop_width() {
     let h = harness();
     let hint = rect(&h, DROP_HINT);
-    let title = rect(&h, "PhotoCraft");
-    for label in ["Home", "Learn", "Website", "Discord", "GitHub"] {
+    let title = rect(&h, "PAULGA Photo");
+    for label in ["Home", "Learn", "Website", "PAULGA Studio", "GitHub"] {
         let link = rect(&h, label);
         assert!(link.right() <= hint.left(), "{label} {link:?} must be in the rail left of the drop hint {hint:?}");
         assert!(link.right() <= title.left(), "{label} {link:?} must be left of the title {title:?}");
     }
     assert!(rect(&h, "Home").bottom() <= rect(&h, "Learn").top(), "Learn follows Home");
     let middle = h.ctx.content_rect().center().y;
-    for label in ["Website", "Discord", "GitHub"] {
+    for label in ["Website", "PAULGA Studio", "GitHub"] {
         assert!(rect(&h, label).top() > middle, "{label} sits at the bottom of the rail");
     }
     assert!(title.bottom() <= hint.top(), "the title is above the page");

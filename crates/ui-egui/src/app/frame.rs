@@ -77,6 +77,7 @@ impl PhotocraftApp {
         let _ = self.live_tokens.poll(ctx, &self.ui.theme);
         #[cfg(not(target_arch = "wasm32"))]
         self.drain_control(ctx);
+        crate::studio::frame(self);
         view_cmds::leave_full_screen_without_document(self);
         // A box drag that ended without a release reaching the Type tool keeps its box, before
         // the commit below can end the edit.

@@ -185,6 +185,7 @@ pub fn inspect(app: &PhotocraftApp, ctx: &egui::Context) -> Value {
         "updatesOpen": app.ui.updates_open,
         "updates": {
             "supported": cfg!(not(target_arch = "wasm32")),
+            "enabled": crate::updates_ui::enabled(app),
             "currentVersion": photocraft_engine::build_info::VERSION,
             "status": crate::updates_ui::status_message(app),
         },

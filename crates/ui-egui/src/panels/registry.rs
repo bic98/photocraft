@@ -224,6 +224,8 @@ pub(crate) static PANELS: &[PanelEntry] = &[
     floating("gradientEditor", || tl!("Gradient Editor").to_string(), "blend", [520.0, 440.0], |app, ui| scrolled(app, ui, crate::gradient_ui::editor::show)),
     floating("measurementLog", || tl!("Measurement Log").to_string(), "ruler", [620.0, 320.0], crate::tools::analysis::log_panel::body),
     floating("notes", || tl!("Notes").to_string(), "square_plus", [260.0, 300.0], |app, ui| scrolled(app, ui, crate::tools::analysis::notes_panel::body)),
+    // The PAULGA Studio connection (`crate::studio`). Last, so the windows before it keep their ids.
+    floating("studio", || tl!("PAULGA Studio").to_string(), "share", [300.0, 320.0], |app, ui| scrolled(app, ui, crate::studio::panel::body)),
 ];
 
 /// The Color panel menu's states, from the panel's own state.

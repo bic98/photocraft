@@ -40,6 +40,8 @@
 //! - `ui.focus`: bring the main window to the front
 //! - `app.open {path}` / `app.save {path}`: relative file I/O under the automation roots; reply with `warnings`
 //! - `app.quit`
+//! - `studio.tool {name, parameters?, expectedRuntimeDocumentId?}`: run a PAULGA Studio tool as Studio's connection
+//!   does ([`crate::studio::tools`]; `get-capabilities` lists them)
 //! - `jobs.list` / `jobs.cancel {job?}`: background jobs (#210) with progress; cancel one (or all).
 //!   `engine.execute`, `ui.menu.invoke` and `ui.dialog.confirm` wait for a command that runs as a
 //!   job unless `wait: false` (then the reply is `{job, pending: true}`)
@@ -126,6 +128,7 @@ pub(super) const METHODS: &[&str] = &[
     "engine.execute",
     "jobs.cancel",
     "jobs.list",
+    "studio.tool",
     "ui.capsLock",
     "ui.click",
     "ui.context.choose",

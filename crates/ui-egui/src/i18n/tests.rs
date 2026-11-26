@@ -451,7 +451,7 @@ fn bundled_catalogs_are_consistent() {
         for line in app.lines().filter(|l| l.starts_with("@id\t")) {
             let id = line.split('\t').nth(1).unwrap_or_default();
             if id != "language.name" && !(crate::menus::is_live(id) || crate::menu_catalog::CATALOG.iter().any(|m| m.3 == id)) {
-                println!("{code}: @id row for a command PhotoCraft doesn't have: {id:?}");
+                println!("{code}: @id row for a command PAULGA Photo doesn't have: {id:?}");
             }
         }
     }

@@ -117,6 +117,7 @@ pub(crate) fn panel(app: &PhotocraftApp, id: &str) -> u64 {
         }
         "cloneSource" => version(app, app.ui.presets_ui.clone_cursor.map(|(document, at)| (document, at.map(f64::to_bits)))),
         "modifierKeys" => version(app, app.ui.shell.latched),
+        "studio" => version(app, crate::studio::panel_key(app)),
         "properties" => version(app, (crate::color_picker_ui::window_picker_state(app, PickWindow::Properties), colours(app), text_target(app))),
         "brushSettings" | "brushes" => version(app, brush(app)),
         "histogram" => version(app, (adjustment_preview(app), histograms(app))),

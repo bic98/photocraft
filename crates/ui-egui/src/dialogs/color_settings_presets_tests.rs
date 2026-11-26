@@ -62,7 +62,7 @@ fn picking_a_setup_loads_it_but_keeps_the_text_gamma() {
     // Blend Text Colors Using Gamma off (1.0) before the pick.
     let mut app = app_with(ColorSettings { blend_text_gamma: 1.0, ..ColorSettings::default() });
     let id = open_dialog(&mut app, 1);
-    assert_eq!(fields(&app, id)["preset"], CUSTOM_SETTINGS, "PhotoCraft's defaults match no setup");
+    assert_eq!(fields(&app, id)["preset"], CUSTOM_SETTINGS, "PAULGA Photo's defaults match no setup");
     dialog_set(&mut app, id, "preset", json!("Europe Prepress 3"));
     show(&mut app, 3);
     let f = fields(&app, id);

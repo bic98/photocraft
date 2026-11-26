@@ -112,6 +112,8 @@ winit = { version = "=0.30.13", default-features = false, features = ["wayland-c
 # Safe Windows screen-capture bindings; Linux uses the pure-Rust X11 client/portal.
 xcap = "=0.9.8"
 winsafe = { version = "=0.0.29", default-features = false, features = ["user", "shell"] }
+# The PAULGA Studio connection (`paulga_studio`): a loopback WebSocket client, no TLS.
+tungstenite = "0.28"
 
 
 [build-dependencies]

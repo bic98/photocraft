@@ -1,3 +1,15 @@
+PAULGA mark (paulga-logo.svg and every icon file in this directory, which are all rendered from
+it: photocraft.svg, photocraft-small.svg, photocraft-1024.png, photocraft.icns, photocraft.ico,
+the photocraft-nightly files and hicolor/).
+
+The mark is PAULGA's own work and a PAULGA brand asset. It identifies PAULGA products. It is not
+offered under the MIT or Apache-2.0 licences that cover the code; the code licences and notices
+(LICENSE-MIT, LICENSE-APACHE, NOTICE) are unchanged.
+
+These files replaced the PhotoCraft app icon (a nine-tailed kitsune), which stays in this
+repository's history and in storytold/photocraft under the notice it was published with:
+
+----
 PhotoCraft app icon (photocraft.svg, photocraft-small.svg and every file derived from them in
 this directory: photocraft-1024.png, photocraft.icns, photocraft.ico, hicolor/).
 

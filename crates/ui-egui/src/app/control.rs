@@ -19,9 +19,34 @@ impl PhotocraftApp {
         self
     }
 
+    /// Attach the host's PAULGA Studio connection: `link` is what the panel and the `studio.*`
+    /// commands read and switch, `rx` carries the tools Studio asks for (`studio.tool` requests).
+    pub fn with_studio(mut self: Box<Self>, link: std::sync::Arc<crate::studio::Link>, rx: Receiver<ControlRequest>) -> Box<Self> {
+        self.studio = Some(link);
+        self.studio_control = Some(ControlChannel::new(rx));
+        self
+    }
+
+    /// Logic phase: run the tools PAULGA Studio asked for. Only `studio.tool` arrives here; any
+    /// other method is refused, so the connection can do nothing a tool does not.
+    fn drain_studio(&mut self, ctx: &egui::Context) {
+        let Some(mut channel) = self.studio_control.take() else { return };
+        let settle = settle_ms(ctx.global_style().animation_time);
+        while let Some(req) = channel.next_request() {
+            let reply = if req.method == "studio.tool" {
+                crate::control::handle(self, ctx, &req)
+            } else {
+                crate::control::Reply::from_result(Err(format!("the PAULGA Studio connection runs only studio.tool, not {}", req.method)))
+            };
+            channel.settle(req, reply, self.document_identity(), settle);
+        }
+        self.studio_control = Some(channel);
+    }
+
     /// Logic phase: finish or expire outstanding captures first, so a request admitted here sees
     /// their released budget, then run the queued requests.
     pub(crate) fn drain_control(&mut self, ctx: &egui::Context) {
+        self.drain_studio(ctx);
         let Some(mut channel) = self.control.take() else { return };
         let document = self.document_identity();
         // begin_pass supplied the new RawInput before App::logic: observe every window's geometry
@@ -112,7 +137,7 @@ impl PhotocraftApp {
 
     /// Job `job` ended: `reply` answers the requests waiting on it.
     pub(crate) fn reply_job(&mut self, job: photocraft_engine::jobs::JobId, reply: &ControlResponse) {
-        if let Some(channel) = self.control.as_mut() {
+        for channel in [self.control.as_mut(), self.studio_control.as_mut()].into_iter().flatten() {
             channel.job_finished(job.0, reply);
         }
     }
@@ -120,6 +145,8 @@ impl PhotocraftApp {
     /// The app is closing: release pending screenshots' image budget and answer their requests;
     /// a late callback is inert (it holds only a weak slot).
     pub(super) fn close_control(&mut self) {
+        // Dropping the channel drops its waiting replies, so the connection thread stops waiting.
+        self.studio_control = None;
         let Some(mut channel) = self.control.take() else { return };
         let finished = channel.captures.cancel_all("the application is closing");
         self.finish_captures(&mut channel, finished);
